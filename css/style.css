@@ -1,31 +1,67 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
 body {
-  font-family: sans-serif;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   max-width: 800px;
   margin: 2rem auto;
   padding: 0 1rem;
-  background-color: #f3f4f6;
+  background: linear-gradient(135deg, #1e1b4b, #0f172a);
+  color: #f3f4f6;
+  position: relative;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* Optional subtle noise texture overlay */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  background: url('https://www.transparenttextures.com/patterns/asfalt-light.png');
+  opacity: 0.1;
+  z-index: -1;
 }
 
 h1 {
   text-align: center;
-  color: #1f2937;
+  font-weight: 700;
+  font-size: 2.2rem;
+  margin-bottom: 2rem;
+  color: #e0e7ff; /* light periwinkle */
+  text-shadow: 0 1px 4px #3b82f6aa;
 }
 
 .filter-bar {
   display: flex;
-  flex-wrap: nowrap; /* prevent wrapping */
   gap: 1rem;
-  margin-bottom: 1.5rem;
-  justify-content: space-between; /* space inputs evenly */
+  margin-bottom: 2rem;
+  padding: 0 0.5rem;
+  justify-content: space-between;
+  flex-wrap: nowrap;
 }
 
 .filter-bar input,
 .filter-bar select {
-  flex: 1 1 0;     /* allow inputs to shrink and grow */
-  min-width: 0;    /* fix flexbox overflow issues */
-  max-width: 180px; /* max width so they don’t get huge */
-  padding: 0.5rem;
+  background-color: #1e293b;
+  color: #f3f4f6;
+  border: 1px solid #475569;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
   font-size: 1rem;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 180px;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.filter-bar input:focus,
+.filter-bar select:focus {
+  outline: none;
+  border-color: #3b82f6; /* bright blue */
+  box-shadow: 0 0 8px #3b82f6;
 }
 
 #reviewsContainer {
@@ -35,11 +71,20 @@ h1 {
 }
 
 .review {
-  border: 1px solid #ddd;
+  border: 1px solid #334155;
   padding: 1rem;
-  border-radius: 8px;
-  background-color: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  background-color: rgba(30, 41, 59, 0.9);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: default;
+  opacity: 0;
+  animation: fadeInUp 0.5s ease forwards;
+}
+
+.review:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.6);
 }
 
 .review-header {
@@ -49,37 +94,61 @@ h1 {
 
 .song {
   font-size: 1.2rem;
-  font-weight: bold;
-  color: #111827;
+  font-weight: 700;
+  color: #cbd5e1; /* light slate */
 }
 
 .artist {
   font-size: 1rem;
-  color: #6b7280;
+  color: #94a3b8; /* lighter gray-blue */
 }
 
 .review div:not(.review-header) {
   text-align: center;
   margin: 0.2rem 0;
-  color: #374151;
+  color: #cbd5e1;
+  font-weight: 600;
 }
 
 .rating-red {
-  background-color: #fee2e2; /* light red */
-  border-left: 6px solid #dc2626; /* bold red */
+  background-color: #331010;
+  border-left: 6px solid #dc2626;
+  box-shadow: 0 0 8px #dc2626aa;
 }
 
 .rating-yellow {
-  background-color: #fef9c3; /* light yellow */
-  border-left: 6px solid #ca8a04; /* bold yellow */
+  background-color: #33320a;
+  border-left: 6px solid #ca8a04;
+  box-shadow: 0 0 8px #ca8a04aa;
 }
 
 .rating-green {
-  background-color: #d1fae5; /* light green */
-  border-left: 6px solid #16a34a; /* bold green */
+  background-color: #0a3320;
+  border-left: 6px solid #16a34a;
+  box-shadow: 0 0 8px #16a34aaa;
 }
 
 .rating-cyan {
-  background-color: #cffafe; /* light cyan */
-  border-left: 6px solid #06b6d4; /* bold cyan */
+  background-color: #0a2733;
+  border-left: 6px solid #06b6d4;
+  box-shadow: 0 0 8px #06b6d4aa;
+}
+
+.no-results {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #94a3b8;
+  margin-top: 2rem;
+}
+
+/* Animation for fade in up */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

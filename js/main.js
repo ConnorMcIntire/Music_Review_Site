@@ -8,7 +8,7 @@ let reviews = [];
 
 async function fetchReviews() {
     try {
-        const res = await fetch('https://script.google.com/macros/s/AKfycbxS6G2hpt2Lsl4esplUzyPY3PsduRHoaKzW6vQyaKW0EPkxuaaXevG_SAy3EZtbUkSx/exec'); // Replace with actual URL
+        const res = await fetch('https://script.google.com/macros/s/AKfycbxS6G2hpt2Lsl4esplUzyPY3PsduRHoaKzW6vQyaKW0EPkxuaaXevG_SAy3EZtbUkSx/exec'); 
         const data = await res.json();
         reviews = data.reviews || data;
         populateFilters();
@@ -50,7 +50,7 @@ function getRatingClass(rating) {
 
 function renderReviews() {
     const filtered = reviews.filter(r => {
-  return (!artistFilter.value || r.artist === artistFilter.value) &&
+  return (!artistFilter.value || r.artist.toLowerCase().includes(artistFilter.value.toLowerCase())) &&
          (!albumFilter.value || r.album === albumFilter.value) &&
          (!ratingFilter.value || r.rating === ratingFilter.value) &&
          (!songSearch.value || r.song.toLowerCase().includes(songSearch.value.toLowerCase()));
@@ -73,8 +73,8 @@ function renderReviews() {
   `).join('');
 }
 
-artistFilter.addEventListener('change', renderReviews);
-albumFilter.addEventListener('change', renderReviews);
+artistFilter.addEventListener('input', renderReviews);
+albumFilter.addEventListener('input', renderReviews);
 ratingFilter.addEventListener('change', renderReviews);
 songSearch.addEventListener('input', renderReviews);
 
