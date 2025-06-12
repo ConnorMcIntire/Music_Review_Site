@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>My Music Reviews</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>🎵 My Music Reviews</h1>
+
+        <div class="filter-bar">
+            <input id="songSearch" type="text" placeholder="Search by song title..." />
+            <input id="artistFilter" list="artistOptions" placeholder="All Artists" />
+            <datalist id="artistOptions"></datalist>
+
+            <input id="albumFilter" list="albumOptions" placeholder="All Albums" />
+            <datalist id="albumOptions"></datalist>
+
+            <select id="ratingFilter">
+                <option value="">All Ratings</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+            </select>
+        </div>
+
+        <div id="reviewsContainer"></div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+
+</html>
