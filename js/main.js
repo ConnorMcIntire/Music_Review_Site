@@ -39,11 +39,11 @@ function getRatingClass(rating) {
 
 function renderReviews() {
   const filtered = reviews.filter(r => {
-  return (!artistFilter.value || (r.artist && r.artist.toLowerCase().includes(artistFilter.value.toLowerCase()))) &&
-         (!albumFilter.value || (r.album && r.album.toLowerCase().includes(albumFilter.value.toLowerCase()))) &&
-         (!ratingFilter.value || r.rating === ratingFilter.value) &&
-         (!songSearch.value || (r.song && r.song.toLowerCase().includes(songSearch.value.toLowerCase())));
-});
+    return (!artistFilter.value || r.artist.toLowerCase().includes(artistFilter.value.toLowerCase())) &&
+           (!albumFilter.value || r.album.toLowerCase().includes(albumFilter.value.toLowerCase())) &&
+           (!ratingFilter.value || r.rating === ratingFilter.value) &&
+           (!songSearch.value || r.song.toLowerCase().includes(songSearch.value.toLowerCase()));
+  });
 
   if (filtered.length === 0) {
     reviewsContainer.innerHTML = `<p class="no-results">No reviews match your filters.</p>`;
@@ -51,15 +51,17 @@ function renderReviews() {
   }
 
   reviewsContainer.innerHTML = filtered.map(r => `
-    <div class="review ${getRatingClass(Number(r.rating))}">
-      <div class="review-header">
-        <div class="song">${r.song}</div>
-        <div class="artist">${r.artist}</div>
+  <div class="review ${getRatingClass(Number(r.rating))}">
+    <div class="review-header">
+      <div class="song">
+        <a href="${r.spotifyLink}" target="_blank" rel="noopener noreferrer">${r.song}</a>
       </div>
-      <div><strong>Album:</strong> ${r.album || 'N/A'}</div>
-      <div><strong>Rating:</strong> ${r.rating}/10</div>
+      <div class="artist">${r.artist}</div>
     </div>
-  `).join('');
+    <div><strong>Album:</strong> ${r.album || 'N/A'}</div>
+    <div><strong>Rating:</strong> ${r.rating}/10</div>
+  </div>
+`).join('');
 }
 
 async function fetchReviews() {
