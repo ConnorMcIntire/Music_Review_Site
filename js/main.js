@@ -54,7 +54,7 @@ function renderReviews() {
   <div class="review ${getRatingClass(Number(r.rating))}">
     <div class="review-header">
       <div class="song">
-        <a href="${r.spotifyLink || '#'}" target="_blank" rel="noopener noreferrer">${r.song}</a>
+        <a href="${r.spotify_link || '#'}" target="_blank" rel="noopener noreferrer">${r.song}</a>
       </div>
       <div class="artist">${r.artist}</div>
     </div>

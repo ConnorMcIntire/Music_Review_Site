@@ -123,3 +123,14 @@ h1 {
   margin-top: 2rem;
   color: #60a5fa; 
 }
+
+.review .song a {
+  color: #06b6d4;    /* Tailwind cyan-400 hex */
+  text-decoration: none; /* removes underline */
+  transition: color 0.3s ease;
+}
+
+.review .song a:hover {
+  color: #0e7490;    /* Tailwind cyan-700 hex for a nice hover effect */
+  text-decoration: underline; /* optional: show underline on hover */
+}
