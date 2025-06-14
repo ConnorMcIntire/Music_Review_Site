@@ -95,8 +95,8 @@ h1 {
 }
 
 .rating-yellow {
-  background-color: #78350f; /* dark yellow/brown */
-  border-left: 6px solid #ca8a04; /* bold yellow */
+  background-color: #8d6d1b; /* dark yellow/brown */
+  border-left: 6px solid #FFF200; /* bold yellow */
 }
 
 .rating-green {
@@ -134,4 +134,3 @@ h1 {
   color: #0e7490;    /* Tailwind cyan-700 hex for a nice hover effect */
   text-decoration: underline; /* optional: show underline on hover */
 }
-

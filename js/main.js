@@ -154,7 +154,7 @@ function renderGridViewFromData(filteredData) {
         <div class="review-header">
           <div class="artist">${artistDisplayNameMap[artistNorm]}</div>
         </div>
-        <div class="song-list" style="display: none; margin-left: 1rem;">
+        <div class="song-list" style="display: none; ;">
           ${albumsHTML}
         </div>
       </div>
