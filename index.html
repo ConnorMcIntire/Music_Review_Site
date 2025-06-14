@@ -9,7 +9,7 @@
 </head>
 
 <body>
-  <h1>🎵 My Music Reviews</h1>
+  <h1>ConCon's Music Reviews</h1>
 
   <div class="filter-bar">
     <input id="artistFilter" placeholder="All Artists" autocomplete="off" />
@@ -36,6 +36,12 @@
 
     <input id="songSearch" placeholder="Search Song..." autocomplete="off" />
   </div>
+
+  <div style="text-align: center; margin-bottom: 1rem;">
+  <button id="toggleViewBtn" style="padding: 0.5rem 1rem; border-radius: 6px; background-color: #475569; color: #e0e7ff; border: none; cursor: pointer;">
+    View Artists
+  </button>
+</div>
 
   <div id="loading">Loading reviews...</div>
   <div id="reviewsContainer" style="display:none;"></div>
