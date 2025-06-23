@@ -1,3 +1,4 @@
+window.addEventListener('DOMContentLoaded', () => {
 const reviewsContainer = document.getElementById('reviewsContainer');
 const artistFilter = document.getElementById('artistFilter');
 const albumFilter = document.getElementById('albumFilter');
@@ -28,29 +29,7 @@ function getMainArtist(artistString) {
   return artistString.toLowerCase().split(/,|\sfeat\.?|\sft\.?/)[0].trim();
 }
 
-function populateFilters() {
-  const allArtists = new Set();
-  reviews.forEach(r => parseArtists(r.artist).forEach(a => allArtists.add(a)));
 
-  const albums = [...new Set(reviews.map(r => r.album).filter(Boolean))];
-
-  const artistOptions = document.getElementById('artistOptions');
-  const albumOptions = document.getElementById('albumOptions');
-  artistOptions.innerHTML = '';
-  albumOptions.innerHTML = '';
-
-  [...allArtists].sort().forEach(artist => {
-    const opt = document.createElement('option');
-    opt.value = artist;
-    artistOptions.appendChild(opt);
-  });
-
-  albums.sort().forEach(album => {
-    const opt = document.createElement('option');
-    opt.value = album;
-    albumOptions.appendChild(opt);
-  });
-}
 
 function getRatingClass(rating) {
   if (rating == 10) return 'border-l-4 border-blue-400 bg-blue-900 text-indigo-100';
@@ -180,7 +159,7 @@ async function fetchReviews() {
     const res = await fetch('https://script.google.com/macros/s/AKfycbxS6G2hpt2Lsl4esplUzyPY3PsduRHoaKzW6vQyaKW0EPkxuaaXevG_SAy3EZtbUkSx/exec');
     const data = await res.json();
     reviews = data.reviews || data;
-    populateFilters();
+
     renderReviews();
   } catch (err) {
     reviewsContainer.innerHTML = `<p class="text-red-400 text-center mt-4">Error loading reviews: ${err.message}</p>`;
@@ -209,6 +188,6 @@ if (toggleBtn) {
   toggleBtn.textContent = 'View Artists';
 }
 
-window.addEventListener('DOMContentLoaded', () => {
+
   setTimeout(fetchReviews, 100);
 });
