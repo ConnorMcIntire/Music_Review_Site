@@ -1,26 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="en" class="bg-slate-900 text-indigo-100">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>My Music Reviews</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <title>ConCon's Music Reviews</title>
+  <link href="css/style.css" rel="stylesheet" />
 </head>
+<body class="max-w-4xl mx-auto p-6 font-sans select-none">
+  <header class="mb-8">
+    <h1 class="text-center text-4xl font-extrabold text-blue-400 tracking-wide drop-shadow-md">
+      ConCon's Music Reviews
+    </h1>
+  </header>
 
-<body>
-  <h1>ConCon's Music Reviews</h1>
+  <section aria-label="Filters" class="flex flex-wrap gap-4 mb-8 justify-center">
+    <input
+      id="artistFilter"
+      placeholder="Filter by Artist"
+      autocomplete="off"
+      class="flex-grow min-w-[160px] max-w-xs p-3 rounded-md bg-slate-700 text-indigo-100 placeholder-slate-400
+             border border-slate-600 focus:border-blue-400 focus:bg-slate-600 focus:outline-none transition"
+    />
+    <datalist id="artistOptions"></datalist>
 
-  <div class="filter-bar">
-    <input id="artistFilter" placeholder="All Artists" autocomplete="off" />
+    <input
+      id="albumFilter"
+      placeholder="Filter by Album"
+      autocomplete="off"
+      class="flex-grow min-w-[160px] max-w-xs p-3 rounded-md bg-slate-700 text-indigo-100 placeholder-slate-400
+             border border-slate-600 focus:border-blue-400 focus:bg-slate-600 focus:outline-none transition"
+    />
+    <datalist id="albumOptions"></datalist>
 
-  <datalist id="artistOptions"></datalist> 
-
-  <input id="albumFilter" placeholder="All Albums" autocomplete="off" />
-
-  <datalist id="albumOptions"></datalist> 
-
-    <select id="ratingFilter" autocomplete="off">
+    <select
+      id="ratingFilter"
+      class="flex-shrink-0 min-w-[8rem] p-3 rounded-md bg-slate-700 text-indigo-100
+         border border-slate-600 focus:border-blue-400 focus:bg-slate-600 focus:outline-none transition"
+    >
       <option value="">All Ratings</option>
       <option value="1">1</option>
       <option value="2">2</option>
@@ -34,19 +50,40 @@
       <option value="10">10</option>
     </select>
 
-    <input id="songSearch" placeholder="Search Song..." autocomplete="off" />
-  </div>
+    <input
+      id="songSearch"
+      placeholder="Search Songs..."
+      autocomplete="off"
+      class="flex-grow min-w-[160px] max-w-xs p-3 rounded-md bg-slate-700 text-indigo-100 placeholder-slate-400
+             border border-slate-600 focus:border-blue-400 focus:bg-slate-600 focus:outline-none transition"
+    />
+  </section>
 
-  <div style="text-align: center; margin-bottom: 1rem;">
-  <button id="toggleViewBtn" style="padding: 0.5rem 1rem; border-radius: 6px; background-color: #475569; color: #e0e7ff; border: none; cursor: pointer;">
-    View Artists
-  </button>
-</div>
+  <section class="text-center mb-8">
+    <button
+      id="toggleViewBtn"
+      class="inline-block px-6 py-3 rounded-md bg-blue-600 text-white font-semibold shadow-md
+             hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 transition"
+      aria-pressed="false"
+    >
+      View Artists
+    </button>
+  </section>
 
-  <div id="loading">Loading reviews...</div>
-  <div id="reviewsContainer" style="display:none;"></div>
+  <main id="content" class="max-w-4xl mx-auto">
+    <div id="loading" class="text-center text-blue-400 text-lg mt-12 font-medium">
+      Loading reviews...
+    </div>
+    <div
+      id="reviewsContainer"
+      class="flex flex-col gap-6 hidden"
+      aria-live="polite"
+      aria-busy="false"
+    >
+      <!-- Reviews will appear here as cards -->
+    </div>
+  </main>
 
   <script src="js/main.js"></script>
 </body>
-
 </html>

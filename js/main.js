@@ -7,42 +7,35 @@ const loadingEl = document.getElementById('loading');
 
 let reviews = [];
 
-// Normalize artist name (trim, lowercase)
+// Helpers
 function normalizeArtist(artist) {
   return artist.trim().toLowerCase();
 }
 
-// Parse all artists from artist string (split on commas and feat/ft)
 function parseArtists(artistString) {
   if (!artistString) return [];
-  // Replace 'feat.' or 'ft.' with comma, lowercase for consistency
-  let cleaned = artistString.toLowerCase();
-  cleaned = cleaned.replace(/\sfeat\.?\s/g, ',').replace(/\sft\.?\s/g, ',');
-  // Split on commas and trim
-  const parts = cleaned.split(',').map(a => a.trim()).filter(a => a.length > 0);
-  return parts;
+  return artistString
+    .toLowerCase()
+    .replace(/\sfeat\.?\s/g, ',')
+    .replace(/\sft\.?\s/g, ',')
+    .split(',')
+    .map(a => a.trim())
+    .filter(Boolean);
 }
 
-// Get main artist (first artist before comma or feat)
 function getMainArtist(artistString) {
   if (!artistString) return '';
-  // Split by 'feat' or ',' and get first
-  let mainPart = artistString.toLowerCase().split(/,|\sfeat\.?|\sft\.?/)[0];
-  return mainPart.trim();
+  return artistString.toLowerCase().split(/,|\sfeat\.?|\sft\.?/)[0].trim();
 }
 
 function populateFilters() {
   const allArtists = new Set();
-  reviews.forEach(r => {
-    const artists = parseArtists(r.artist);
-    artists.forEach(a => allArtists.add(a));
-  });
+  reviews.forEach(r => parseArtists(r.artist).forEach(a => allArtists.add(a)));
 
-  const albums = [...new Set(reviews.map(r => r.album).filter(a => a))];
+  const albums = [...new Set(reviews.map(r => r.album).filter(Boolean))];
 
   const artistOptions = document.getElementById('artistOptions');
   const albumOptions = document.getElementById('albumOptions');
-
   artistOptions.innerHTML = '';
   albumOptions.innerHTML = '';
 
@@ -60,36 +53,35 @@ function populateFilters() {
 }
 
 function getRatingClass(rating) {
-  if (rating == 10) return 'rating-cyan';
-  if (rating >= 8) return 'rating-green';
-  if (rating >= 5) return 'rating-yellow';
-  return 'rating-red';
+  if (rating == 10) return 'border-l-4 border-blue-400 bg-blue-900 text-indigo-100';
+  if (rating >= 8) return 'border-l-4 border-green-500 bg-green-900';
+  if (rating >= 5) return 'border-l-4 border-yellow-300 bg-yellow-800';
+  return 'border-l-4 border-red-600 bg-red-900';
 }
 
 function renderListView(filtered) {
   if (filtered.length === 0) {
-    reviewsContainer.innerHTML = `<p class="no-results">No reviews match your filters.</p>`;
+    reviewsContainer.innerHTML = `<p class="text-center text-slate-400 italic py-8">No reviews match your filters.</p>`;
     return;
   }
 
   reviewsContainer.innerHTML = filtered.map(r => `
-    <div class="review ${getRatingClass(Number(r.rating))}">
-      <div class="review-header">
-        <div class="song">
-          <a href="${r.spotify_link || '#'}" target="_blank" rel="noopener noreferrer">${r.song}</a>
+    <div class="p-4 rounded shadow transition-shadow hover:shadow-lg ${getRatingClass(Number(r.rating))}">
+      <div class="text-center mb-2">
+        <div class="text-lg font-bold text-blue-200">
+          <a href="${r.spotify_link || '#'}" target="_blank" class="text-cyan-400 hover:text-cyan-600 hover:underline">${r.song}</a>
         </div>
-        <div class="artist">${r.artist}</div>
+        <div class="text-base text-blue-300">${r.artist}</div>
       </div>
-      <div><strong>Album:</strong> ${r.album || 'N/A'}</div>
-      <div><strong>Rating:</strong> ${r.rating}/10</div>
+      <div class="text-center text-slate-300"><strong>Album:</strong> ${r.album || 'N/A'}</div>
+      <div class="text-center text-slate-300"><strong>Rating:</strong> ${r.rating}/10</div>
     </div>
   `).join('');
 }
 
 function renderGridViewFromData(filteredData) {
-  // artistGroups will map normalized artist -> all songs this artist appears on (main or feature)
   const artistGroups = {};
-  const artistDisplayNameMap = {}; // normalized artist -> nicely capitalized name
+  const artistDisplayNameMap = {};
 
   filteredData.forEach(song => {
     const allArtists = parseArtists(song.artist);
@@ -107,25 +99,22 @@ function renderGridViewFromData(filteredData) {
     });
   });
 
-  // Convert Sets to arrays, remove duplicates automatically
   for (const artist in artistGroups) {
     artistGroups[artist] = Array.from(artistGroups[artist]);
   }
 
-  // Sort artists alphabetically by display name
-  const sortedArtists = Object.keys(artistGroups).sort((a, b) => {
-    return artistDisplayNameMap[a].localeCompare(artistDisplayNameMap[b]);
-  });
+  const sortedArtists = Object.keys(artistGroups).sort((a, b) =>
+    artistDisplayNameMap[a].localeCompare(artistDisplayNameMap[b])
+  );
 
   if (sortedArtists.length === 0) {
-    reviewsContainer.innerHTML = `<p class="no-results">No reviews match your filters.</p>`;
+    reviewsContainer.innerHTML = `<p class="text-center text-slate-400 italic py-8">No reviews match your filters.</p>`;
     return;
   }
 
   reviewsContainer.innerHTML = sortedArtists.map(artistNorm => {
     const songs = artistGroups[artistNorm];
 
-    // Group songs by album for this artist
     const albumsGrouped = songs.reduce((acc, song) => {
       const albumName = song.album || 'Unknown Album';
       if (!acc[albumName]) acc[albumName] = [];
@@ -133,16 +122,16 @@ function renderGridViewFromData(filteredData) {
       return acc;
     }, {});
 
-    const sortedAlbums = Object.keys(albumsGrouped).sort((a, b) => a.localeCompare(b));
+    const sortedAlbums = Object.keys(albumsGrouped).sort();
 
     const albumsHTML = sortedAlbums.map(album => `
-      <div style="margin: 0.5rem 0;">
-        <div style="font-weight: 600; color: #93c5fd;">${album}</div>
-        <div style="margin-left: 1rem;">
+      <div class="my-2">
+        <div class="font-semibold text-blue-300">${album}</div>
+        <div class="ml-4">
           ${albumsGrouped[album].map(r => `
-            <div style="margin: 0.3rem 0;">
-              <a href="${r.spotify_link || '#'}" target="_blank" style="color:#06b6d4">${r.song}</a>
-              <span style="color:#cbd5e1"> (${r.rating}/10)</span>
+            <div class="my-1">
+              <a href="${r.spotify_link || '#'}" target="_blank" class="text-cyan-400 hover:text-cyan-600">${r.song}</a>
+              <span class="text-slate-300"> (${r.rating}/10)</span>
             </div>
           `).join('')}
         </div>
@@ -150,24 +139,18 @@ function renderGridViewFromData(filteredData) {
     `).join('');
 
     return `
-      <div class="review" style="cursor: pointer;">
-        <div class="review-header">
-          <div class="artist">${artistDisplayNameMap[artistNorm]}</div>
-        </div>
-        <div class="song-list" style="display: none; ;">
-          ${albumsHTML}
-        </div>
+      <div class="p-4 rounded shadow bg-slate-700 text-indigo-100 cursor-pointer">
+        <div class="text-center mb-2 text-lg font-bold text-blue-300">${artistDisplayNameMap[artistNorm]}</div>
+        <div class="song-list hidden">${albumsHTML}</div>
       </div>
     `;
   }).join('');
 
-  // Add toggle click functionality
-  document.querySelectorAll('.review').forEach(div => {
-    div.addEventListener('click', () => {
-      const list = div.querySelector('.song-list');
-      if (list) {
-        list.style.display = list.style.display === 'none' ? 'block' : 'none';
-      }
+  // Toggle show/hide
+  document.querySelectorAll('.song-list').forEach((list, index) => {
+    const container = list.parentElement;
+    container.addEventListener('click', () => {
+      list.classList.toggle('hidden');
     });
   });
 }
@@ -179,7 +162,7 @@ function renderReviews() {
 
     const artistMatch = !artistFilterVal || artistsOnSong.some(a => a.includes(artistFilterVal));
     const albumMatch = !albumFilter.value || (r.album && r.album.toLowerCase().includes(albumFilter.value.toLowerCase()));
-    const ratingMatch = !ratingFilter.value || r.rating === ratingFilter.value;
+    const ratingMatch = !ratingFilter.value || Number(r.rating) === Number(ratingFilter.value);
     const songMatch = !songSearch.value || r.song.toLowerCase().includes(songSearch.value.toLowerCase());
 
     return artistMatch && albumMatch && ratingMatch && songMatch;
@@ -192,7 +175,6 @@ function renderReviews() {
   }
 }
 
-// Fetch data from Google Sheets
 async function fetchReviews() {
   try {
     const res = await fetch('https://script.google.com/macros/s/AKfycbxS6G2hpt2Lsl4esplUzyPY3PsduRHoaKzW6vQyaKW0EPkxuaaXevG_SAy3EZtbUkSx/exec');
@@ -201,13 +183,14 @@ async function fetchReviews() {
     populateFilters();
     renderReviews();
   } catch (err) {
-    reviewsContainer.innerHTML = `<p>Error loading reviews: ${err.message}</p>`;
+    reviewsContainer.innerHTML = `<p class="text-red-400 text-center mt-4">Error loading reviews: ${err.message}</p>`;
   } finally {
     loadingEl.style.display = 'none';
-    reviewsContainer.style.display = 'flex';
+    reviewsContainer.classList.remove('hidden');
   }
 }
 
+// Event listeners
 artistFilter.addEventListener('input', renderReviews);
 albumFilter.addEventListener('input', renderReviews);
 ratingFilter.addEventListener('change', renderReviews);
@@ -223,8 +206,7 @@ if (toggleBtn) {
     renderReviews();
   });
 
-  // Set initial label
-  toggleBtn.textContent = window.currentView === 'list' ? 'View Artists' : 'All Songs';
+  toggleBtn.textContent = 'View Artists';
 }
 
 window.addEventListener('DOMContentLoaded', () => {
