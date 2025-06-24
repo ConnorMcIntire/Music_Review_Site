@@ -58,51 +58,51 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderGridViewFromData(filteredData) {
-  const artistGroups = {};
-  const artistDisplayNameMap = {};
+    const artistGroups = {};
+    const artistDisplayNameMap = {};
 
-  filteredData.forEach(song => {
-    const allArtists = parseArtists(song.artist);
-    const mainArtist = normalizeArtist(getMainArtist(song.artist));
+    filteredData.forEach(song => {
+      const allArtists = parseArtists(song.artist);
+      const mainArtist = normalizeArtist(getMainArtist(song.artist));
 
-    allArtists.forEach(artistNorm => {
-      if (!artistGroups[artistNorm]) {
-        artistGroups[artistNorm] = new Set();
-        artistDisplayNameMap[artistNorm] = artistNorm
-          .split(' ')
-          .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-          .join(' ');
-      }
-      artistGroups[artistNorm].add(song);
+      allArtists.forEach(artistNorm => {
+        if (!artistGroups[artistNorm]) {
+          artistGroups[artistNorm] = new Set();
+          artistDisplayNameMap[artistNorm] = artistNorm
+            .split(' ')
+            .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(' ');
+        }
+        artistGroups[artistNorm].add(song);
+      });
     });
-  });
 
-  for (const artist in artistGroups) {
-    artistGroups[artist] = Array.from(artistGroups[artist]);
-  }
+    for (const artist in artistGroups) {
+      artistGroups[artist] = Array.from(artistGroups[artist]);
+    }
 
-  const sortedArtists = Object.keys(artistGroups).sort((a, b) =>
-    artistDisplayNameMap[a].localeCompare(artistDisplayNameMap[b])
-  );
+    const sortedArtists = Object.keys(artistGroups).sort((a, b) =>
+      artistDisplayNameMap[a].localeCompare(artistDisplayNameMap[b])
+    );
 
-  if (sortedArtists.length === 0) {
-    reviewsContainer.innerHTML = `<p class="text-center text-slate-400 italic py-8">No reviews match your filters.</p>`;
-    return;
-  }
+    if (sortedArtists.length === 0) {
+      reviewsContainer.innerHTML = `<p class="text-center text-slate-400 italic py-8">No reviews match your filters.</p>`;
+      return;
+    }
 
-  reviewsContainer.innerHTML = sortedArtists.map(artistNorm => {
-    const songs = artistGroups[artistNorm];
+    reviewsContainer.innerHTML = sortedArtists.map(artistNorm => {
+      const songs = artistGroups[artistNorm];
 
-    const albumsGrouped = songs.reduce((acc, song) => {
-      const albumName = song.album || 'Unknown Album';
-      if (!acc[albumName]) acc[albumName] = [];
-      acc[albumName].push(song);
-      return acc;
-    }, {});
+      const albumsGrouped = songs.reduce((acc, song) => {
+        const albumName = song.album || 'Unknown Album';
+        if (!acc[albumName]) acc[albumName] = [];
+        acc[albumName].push(song);
+        return acc;
+      }, {});
 
-    const sortedAlbums = Object.keys(albumsGrouped).sort();
+      const sortedAlbums = Object.keys(albumsGrouped).sort();
 
-    const albumsHTML = sortedAlbums.map(album => `
+      const albumsHTML = sortedAlbums.map(album => `
       <div class="my-4 text-center">
         <div class="font-semibold text-blue-300 text-lg mb-1">${album}</div>
         <div class="flex flex-col items-center gap-1">
@@ -116,28 +116,28 @@ window.addEventListener('DOMContentLoaded', () => {
       </div>
     `).join('');
 
-    return `
+      return `
       <div class="p-4 rounded shadow bg-slate-700 text-indigo-100 cursor-pointer">
         <div class="text-center mb-2 text-lg font-bold text-blue-300">${artistDisplayNameMap[artistNorm]}</div>
         <div class="song-list max-h-0 overflow-hidden transition-all duration-300 ease-in-out">${albumsHTML}</div>
       </div>
     `;
-  }).join('');
+    }).join('');
 
-  // Toggle show/hide
-  document.querySelectorAll('.song-list').forEach((list) => {
-    const container = list.parentElement;
-    container.addEventListener('click', () => {
-      if (list.classList.contains('max-h-0')) {
-        list.classList.remove('max-h-0');
-        list.classList.add('max-h-[500px]');
-      } else {
-        list.classList.remove('max-h-[500px]');
-        list.classList.add('max-h-0');
-      }
+    // Toggle show/hide
+    document.querySelectorAll('.song-list').forEach((list) => {
+      const container = list.parentElement;
+      container.addEventListener('click', () => {
+        if (list.classList.contains('max-h-0')) {
+          list.classList.remove('max-h-0');
+          list.classList.add('max-h-full');
+        } else {
+          list.classList.remove('max-h-full');
+          list.classList.add('max-h-0');
+        }
+      });
     });
-  });
-}
+  }
 
   function renderReviews() {
     const filtered = reviews.filter(r => {
