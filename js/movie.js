@@ -1,5 +1,12 @@
 let movieData = [];
 let filteredMovies = [];
+const filters = {
+  title: '',
+  director: '',
+  year: '',
+  genre: '',
+  rating: ''
+};
 
 async function fetchMovies() {
   try {
@@ -54,26 +61,15 @@ function addOptions(selector, values) {
   });
 }
 
-function filterMovies() {
-  const genre = document.querySelector("#genreFilter").value.toLowerCase();
-  const director = document.querySelector("#directorFilter").value.toLowerCase();
-  const year = document.querySelector("#yearFilter").value;
-  const rating = document.querySelector("#ratingFilter").value;
-  const search = document.querySelector("#titleSearch").value.toLowerCase();
-
+function applyFilters() {
   filteredMovies = movieData.filter((movie) => {
-    const genres = movie.genre ? movie.genre.toLowerCase() : '';
+    const titleMatch = !filters.title || (movie.title && movie.title.toLowerCase().includes(filters.title.toLowerCase()));
+    const directorMatch = !filters.director || (movie.director && movie.director.toLowerCase().includes(filters.director.toLowerCase()));
+    const yearMatch = !filters.year || (movie.year && movie.year.toLowerCase().includes(filters.year.toLowerCase()));
+    const genreMatch = !filters.genre || (movie.genre && movie.genre.toLowerCase().includes(filters.genre.toLowerCase()));
+    const ratingMatch = !filters.rating || movie.rating === filters.rating;
 
-    const genreMatch = !genre || genres.includes(genre);
-    const directorMatch = !director || (movie.director && movie.director.toLowerCase().includes(director));
-    const yearMatch = !year || movie.year === year;
-    const ratingMatch = !rating || movie.rating === rating;
-    const searchMatch =
-      !search ||
-      (movie.title && movie.title.toLowerCase().includes(search)) ||
-      (movie.director && movie.director.toLowerCase().includes(search));
-
-    return genreMatch && directorMatch && yearMatch && ratingMatch && searchMatch;
+    return titleMatch && directorMatch && yearMatch && genreMatch && ratingMatch;
   });
 
   renderMovies(filteredMovies);
@@ -139,8 +135,28 @@ function groupBy(arr, key) {
 
 document.addEventListener("DOMContentLoaded", fetchMovies);
 
-document.querySelectorAll("#genreFilter, #directorFilter, #yearFilter, #ratingFilter").forEach(el =>
-  el.addEventListener("change", filterMovies)
-);
 
-document.querySelector("#titleSearch").addEventListener("input", filterMovies);
+document.getElementById("titleFilter").addEventListener("input", (e) => {
+  filters.title = e.target.value;
+  applyFilters();
+});
+
+document.getElementById("directorFilter").addEventListener("input", (e) => {
+  filters.director = e.target.value;
+  applyFilters();
+});
+
+document.getElementById("yearFilter").addEventListener("input", (e) => {
+  filters.year = e.target.value;
+  applyFilters();
+});
+
+document.getElementById("genreFilter").addEventListener("change", (e) => {
+  filters.genre = e.target.value;
+  applyFilters();
+});
+
+document.getElementById("ratingFilter").addEventListener("change", (e) => {
+  filters.rating = e.target.value;
+  applyFilters();
+});
