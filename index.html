@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-slate-900 text-slate-100">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ConCon's Reviews Home</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <style>
+    body, html {
+      background-color: #0f172a; /* Tailwind bg-slate-900 hex */
+      color: #e0e7ff; /* Tailwind slate-100 hex */
+      margin: 0;
+      height: 100%;
+      font-family: system-ui, sans-serif;
+    }
+    /* Gradient header text */
+    .text-gradient {
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      background-image: linear-gradient(to right, #60a5fa, #8b5cf6, #ec4899);
+    }
+    /* Buttons styles */
+    .btn-music {
+      background: linear-gradient(135deg, #4f46e5, #3b82f6);
+      border-color: #2563eb;
+      box-shadow: 0 4px 14px rgb(59 130 246 / 0.7);
+      transition: all 0.3s ease;
+    }
+    .btn-music:hover {
+      background: linear-gradient(135deg, #4338ca, #2563eb);
+      box-shadow: 0 6px 20px rgb(37 99 235 / 0.9);
+      border-color: #1e40af;
+      color: #dbeafe;
+    }
+    .btn-movie {
+      background: linear-gradient(135deg, #ef4444, #f97316);
+      border-color: #ea580c;
+      box-shadow: 0 4px 14px rgb(249 115 22 / 0.7);
+      transition: all 0.3s ease;
+    }
+    .btn-movie:hover {
+      background: linear-gradient(135deg, #dc2626, #ea580c);
+      box-shadow: 0 6px 20px rgb(234 88 12 / 0.9);
+      border-color: #b45309;
+      color: #fee2e2;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Hero -->
+  <header class="text-center mb-12">
+    <h1 class="text-5xl font-extrabold text-gradient mb-4 tracking-tight">
+      ConCon's Reviews
+    </h1>
+    <p class="text-indigo-300 text-xl">Choose your vibe — movies or music.</p>
+    <div class="mt-4 h-1 w-32 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 mx-auto rounded"></div>
+  </header>
+
+  <!-- Selection Section -->
+  <section class="bg-slate-800 rounded-xl p-8 shadow-lg mb-10">
+    <div class="flex flex-col sm:flex-row justify-center gap-8">
+      <a
+        href="music.html"
+        class="btn-music flex-1 text-center px-8 py-12 rounded-lg border text-white font-semibold text-2xl select-none"
+        >Go to Music Reviews</a
+      >
+      <a
+        href="movie.html"
+        class="btn-movie flex-1 text-center px-8 py-12 rounded-lg border text-white font-semibold text-2xl select-none"
+        >Go to Movie Reviews</a
+      >
+    </div>
+  </section>
+
+</body>
+
+</html>
