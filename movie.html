@@ -9,20 +9,26 @@
 </head>
 
 <body class="max-w-4xl mx-auto px-4 py-8 font-sans">
-<nav class="bg-slate-900 max-w-4xl mx-auto rounded-full px-6 py-3 mb-8 shadow-md flex justify-center gap-6 font-medium text-slate-300 select-none">
-  <a href="index.html" class="px-5 py-2 rounded-full hover:bg-blue-600 hover:text-white transition">
-    Home
-  </a>
-  <a href="book.html" class="px-5 py-2 rounded-full hover:bg-blue-600 hover:text-white transition">
-    Book Reviews
-  </a>
-  <a href="music.html" class="px-5 py-2 rounded-full hover:bg-blue-600 hover:text-white transition">
-    Music Reviews
-  </a>
-  <a href="movie.html" aria-current="page" class="px-5 py-2 rounded-full bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 text-white shadow-md cursor-default">
-    Movie Reviews
-  </a>
-</nav>
+  <nav
+    class="bg-slate-900 max-w-4xl mx-auto rounded-full px-6 py-3 mb-8 shadow-md flex justify-center gap-6 font-medium text-slate-300 select-none">
+    <a href="index.html" class="px-5 py-2 rounded-full hover:bg-blue-600 hover:text-white transition">
+      Home
+    </a>
+    <a href="book.html" class="px-5 py-2 rounded-full hover:bg-blue-600 hover:text-white transition">
+      Book Reviews
+    </a>
+    <a href="game.html" class="px-5 py-2 rounded-full hover:bg-blue-600 hover:text-white transition">
+      Game Reviews
+    </a>
+    <a href="music.html" class="px-5 py-2 rounded-full hover:bg-blue-600 hover:text-white transition">
+      Music Reviews
+    </a>
+    <a href="movie.html" aria-current="page"
+      class="px-5 py-2 rounded-full bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 text-white shadow-md cursor-default">
+      Movie Reviews
+    </a>
+
+  </nav>
 
 
   <!-- Hero -->
@@ -33,68 +39,47 @@
   </header>
 
   <!-- Movie Filter Section -->
-<section class="bg-slate-800 rounded-xl p-6 shadow mb-10">
-  <div class="flex flex-wrap gap-4 justify-between">
-    <input
-      id="titleFilter"
-      type="text"
-      placeholder="Filter by Title"
-      class="flex-1 min-w-[10rem] p-3 rounded-md bg-slate-700 text-slate-100 border border-slate-600
-             focus:border-blue-400 focus:bg-slate-600 focus:outline-none transition"
-    />
+  <section class="bg-slate-800 rounded-xl p-6 shadow mb-10">
+    <div class="flex flex-wrap gap-4 justify-between">
+      <input id="titleFilter" type="text" placeholder="Filter by Title" class="flex-1 min-w-[10rem] p-3 rounded-md bg-slate-700 text-slate-100 border border-slate-600
+             focus:border-blue-400 focus:bg-slate-600 focus:outline-none transition" />
 
-    <input
-      id="directorFilter"
-      type="text"
-      placeholder="Filter by Director"
-      class="flex-1 min-w-[10rem] p-3 rounded-md bg-slate-700 text-slate-100 border border-slate-600
-             focus:border-blue-400 focus:bg-slate-600 focus:outline-none transition"
-    />
+      <input id="directorFilter" type="text" placeholder="Filter by Director" class="flex-1 min-w-[10rem] p-3 rounded-md bg-slate-700 text-slate-100 border border-slate-600
+             focus:border-blue-400 focus:bg-slate-600 focus:outline-none transition" />
 
-    <input
-      id="yearFilter"
-      type="text"
-      placeholder="Filter by Year"
-      class="w-32 p-3 rounded-md bg-slate-700 text-slate-100 border border-slate-600
-             focus:border-blue-400 focus:bg-slate-600 focus:outline-none transition"
-    />
+      <input id="yearFilter" type="text" placeholder="Filter by Year" class="w-32 p-3 rounded-md bg-slate-700 text-slate-100 border border-slate-600
+             focus:border-blue-400 focus:bg-slate-600 focus:outline-none transition" />
 
-    <select
-      id="genreFilter"
-      class="w-40 p-3 rounded-md bg-slate-700 text-slate-100 border border-slate-600
-             focus:border-blue-400 focus:bg-slate-600 focus:outline-none transition"
-    >
-      <option value="">All Genres</option>
-      <option value="Action">Action</option>
-      <option value="Comedy">Comedy</option>
-      <option value="Drama">Drama</option>
-      <option value="Horror">Horror</option>
-      <option value="Romance">Romance</option>
-      <option value="Sci-Fi">Sci-Fi</option>
-      <option value="Thriller">Thriller</option>
-      <option value="Documentary">Documentary</option>
-      <!-- Add more as needed -->
-    </select>
+      <select id="genreFilter" class="w-40 p-3 rounded-md bg-slate-700 text-slate-100 border border-slate-600
+             focus:border-blue-400 focus:bg-slate-600 focus:outline-none transition">
+        <option value="">All Genres</option>
+        <option value="Action">Action</option>
+        <option value="Comedy">Comedy</option>
+        <option value="Drama">Drama</option>
+        <option value="Horror">Horror</option>
+        <option value="Romance">Romance</option>
+        <option value="Sci-Fi">Sci-Fi</option>
+        <option value="Thriller">Thriller</option>
+        <option value="Documentary">Documentary</option>
+        <!-- Add more as needed -->
+      </select>
 
-    <select
-      id="movieRatingFilter"
-      class="w-32 p-3 rounded-md bg-slate-700 text-slate-100 border border-slate-600
-             focus:border-blue-400 focus:bg-slate-600 focus:outline-none transition"
-    >
-      <option value="">All Ratings</option>
-      <option value="1">1</option>
-      <option value="2">2</option>
-      <option value="3">3</option>
-      <option value="4">4</option>
-      <option value="5">5</option>
-      <option value="6">6</option>
-      <option value="7">7</option>
-      <option value="8">8</option>
-      <option value="9">9</option>
-      <option value="10">10</option>
-    </select>
-  </div>
-</section>
+      <select id="movieRatingFilter" class="w-32 p-3 rounded-md bg-slate-700 text-slate-100 border border-slate-600
+             focus:border-blue-400 focus:bg-slate-600 focus:outline-none transition">
+        <option value="">All Ratings</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+        <option value="10">10</option>
+      </select>
+    </div>
+  </section>
 
   <!-- Result Count -->
   <div id="resultCount" class="text-center text-sm text-slate-400 mb-4"></div>
