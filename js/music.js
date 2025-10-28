@@ -30,12 +30,15 @@ window.addEventListener('DOMContentLoaded', () => {
     return artistString.toLowerCase().split(/,|\sfeat\.?|\sft\.?/)[0].trim();
   }
 
-  function getRatingClass(rating) {
-    if (rating == 10) return 'border-l-4 border-blue-400 bg-blue-900 text-indigo-100';
-    if (rating >= 8) return 'border-l-4 border-green-500 bg-green-900';
-    if (rating >= 5) return 'border-l-4 border-yellow-300 bg-yellow-800';
-    return 'border-l-4 border-red-600 bg-red-900';
-  }
+  function getRatingStyle(rating) {
+  if (rating == 10) return 'border-left:4px solid #60A5FA; background:#1E3A8A; color:#E0E7FF;';
+  if (rating == 9) return 'border-left:4px solid #15803D; background:#14532D; color:#D1FAE5;';
+  if (rating >=7 && rating <=8) return 'border-left:4px solid #4ADE80; background:#166534; color:#D1FAE5;';
+  if (rating >=5 && rating <=6) return 'border-left:4px solid #aea000c7; background:#aea000c7; color:#FEF3C7;';
+  if (rating >=3 && rating <=4) return 'border-left:4px solid #F97316; background:#7C2D12; color:#FFEDD5;';
+  return 'border-left:4px solid #DC2626; background:#7F1D1D; color:#FEE2E2;';
+}
+
 
   function renderListView(filtered) {
     if (filtered.length === 0) {
@@ -44,7 +47,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     reviewsContainer.innerHTML = filtered.map(r => `
-      <div class="p-4 rounded shadow transition-transform transform hover:scale-[1.02] hover:shadow-lg ${getRatingClass(Number(r.rating))}">
+      <div class="p-4 rounded shadow transition-transform transform hover:scale-[1.02] hover:shadow-lg" style="${getRatingStyle(Number(r.rating))}">
         <div class="text-center mb-2">
           <div class="text-lg font-bold text-blue-200">
             <a href="${r.spotify_link || '#'}" target="_blank" class="text-cyan-400 hover:text-cyan-600 hover:underline">${r.song}</a>
@@ -117,7 +120,7 @@ window.addEventListener('DOMContentLoaded', () => {
     `).join('');
 
       return `
-      <div class="p-4 rounded shadow bg-slate-700 text-indigo-100 cursor-pointer">
+      <div class="p-4 rounded shadow cursor-pointer" style="${getRatingStyle(Number(r.rating))}">
         <div class="text-center mb-2 text-lg font-bold text-blue-300">${artistDisplayNameMap[artistNorm]}</div>
         <div class="song-list max-h-0 overflow-hidden transition-all duration-300 ease-in-out">${albumsHTML}</div>
       </div>
