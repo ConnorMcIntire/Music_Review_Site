@@ -60,76 +60,98 @@ window.addEventListener('DOMContentLoaded', () => {
     `).join('');
   }
 
-  // Render Grid View
+  // Render Grid View (now: Albums view)
   function renderGridViewFromData(filteredData) {
-    const artistGroups = {};
-    const artistDisplayNameMap = {};
+    try {
+      // drop invalid items and remove entries that are singles (so they don't appear as albums)
+      filteredData = (filteredData || [])
+        .filter(it => it && typeof it === 'object')
+        .filter(song => {
+          const albumLower = String((song && song.album) || '').trim().toLowerCase();
+          return !(albumLower === 'single' || albumLower === 'singles' || /^single\b/.test(albumLower));
+        });
+ 
+      const albumsMap = {};
 
-    filteredData.forEach(song => {
-      const allArtists = parseArtists(song.artist);
-      allArtists.forEach(artistNorm => {
-        if (!artistGroups[artistNorm]) {
-          artistGroups[artistNorm] = [];
-          artistDisplayNameMap[artistNorm] = artistNorm
+      filteredData.forEach(song => {
+        const albumRaw = song && song.album;
+        const albumName = (albumRaw == null) ? 'Unknown Album' : String(albumRaw);
+        const artistRaw = song && song.artist;
+        const mainArtist = getMainArtist(String(artistRaw || '')) || 'Various Artists';
+        const albumKey = `${normalize(albumName)}|${normalize(mainArtist)}`;
+
+        if (!albumsMap[albumKey]) {
+          const displayArtist = String(mainArtist)
             .split(' ')
             .map(w => w.charAt(0).toUpperCase() + w.slice(1))
             .join(' ');
+          albumsMap[albumKey] = {
+            displayAlbum: String(albumName),
+            displayArtist,
+            songs: []
+          };
         }
-        artistGroups[artistNorm].push(song);
+        albumsMap[albumKey].songs.push(song);
       });
-    });
 
-    const sortedArtists = Object.keys(artistGroups).sort((a, b) =>
-      artistDisplayNameMap[a].localeCompare(artistDisplayNameMap[b])
-    );
+      const sortedAlbumKeys = Object.keys(albumsMap).sort((a, b) => {
+        const A = String(albumsMap[a].displayAlbum || '').toLowerCase();
+        const B = String(albumsMap[b].displayAlbum || '').toLowerCase();
+        if (A === B) return String(albumsMap[a].displayArtist || '').localeCompare(String(albumsMap[b].displayArtist || ''));
+        return A.localeCompare(B);
+      });
 
-    if (!sortedArtists.length) {
-      reviewsContainer.innerHTML = `<p class="text-center text-slate-400 italic py-8">No reviews match your filters.</p>`;
-      return;
-    }
+      if (!sortedAlbumKeys.length) {
+        reviewsContainer.innerHTML = `<p class="text-center text-slate-400 italic py-8">No reviews match your filters.</p>`;
+        return;
+      }
 
-    reviewsContainer.innerHTML = sortedArtists.map(artistNorm => {
-      const songs = artistGroups[artistNorm];
+      reviewsContainer.innerHTML = sortedAlbumKeys.map(key => {
+        const group = albumsMap[key];
+        const songs = group.songs || [];
 
-      const albumsGrouped = songs.reduce((acc, song) => {
-        const albumName = song.album || 'Unknown Album';
-        if (!acc[albumName]) acc[albumName] = [];
-        acc[albumName].push(song);
-        return acc;
-      }, {});
+        const total = songs.reduce((sum, s) => sum + (Number(s && s.rating) || 0), 0);
+        const avg = songs.length ? (total / songs.length) : 0;
+        const avgDisplay = Math.round(avg * 10) / 10;
 
-      const sortedAlbums = Object.keys(albumsGrouped).sort();
+        const songsHTML = songs.map(r => {
+          const title = (r && r.song) ? String(r.song) : 'Untitled';
+          const rating = (r && (r.rating != null)) ? r.rating : 'N/A';
+          const spotify = (r && r.spotify_link) ? r.spotify_link : '#';
+          return `
+            <div>
+              <a href="${spotify}" target="_blank" class="text-cyan-400 hover:text-cyan-600">${title}</a>
+              <span class="text-slate-300"> (${rating}/10)</span>
+            </div>
+          `;
+        }).join('');
 
-      const albumsHTML = sortedAlbums.map(album => `
-        <div class="my-4 text-center">
-          <div class="font-semibold text-blue-300 text-lg mb-1">${album}</div>
-          <div class="flex flex-col items-center gap-1">
-            ${albumsGrouped[album].map(r => `
-              <div>
-                <a href="${r.spotify_link || '#'}" target="_blank" class="text-cyan-400 hover:text-cyan-600">${r.song}</a>
-                <span class="text-slate-300"> (${r.rating}/10)</span>
+        return `
+          <div class="p-4 rounded shadow cursor-pointer" style="${getRatingStyle(Math.round(avg))}">
+            <div class="text-center mb-1">
+              <div class="text-lg font-bold text-blue-300">
+                ${group.displayAlbum} <span class="text-sm text-slate-300">(${avgDisplay}/10)</span>
               </div>
-            `).join('')}
+              <div class="text-sm text-slate-400">${group.displayArtist}</div>
+            </div>
+            <div class="song-list max-h-0 overflow-hidden transition-all duration-300 ease-in-out flex flex-col items-center gap-2 text-center">
+              ${songsHTML}
+            </div>
           </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
 
-      return `
-        <div class="p-4 rounded shadow cursor-pointer" style="${getRatingStyle(Number(songs[0].rating))}">
-          <div class="text-center mb-2 text-lg font-bold text-blue-300">${artistDisplayNameMap[artistNorm]}</div>
-          <div class="song-list max-h-0 overflow-hidden transition-all duration-300 ease-in-out">${albumsHTML}</div>
-        </div>
-      `;
-    }).join('');
-
-    // Toggle show/hide
-    document.querySelectorAll('.song-list').forEach(list => {
-      const container = list.parentElement;
-      container.addEventListener('click', () => {
-        list.classList.toggle('max-h-0');
-        list.classList.toggle('max-h-full');
+      document.querySelectorAll('.song-list').forEach(list => {
+        const container = list.parentElement;
+        container.addEventListener('click', () => {
+          list.classList.toggle('max-h-0');
+          list.classList.toggle('max-h-full');
+        });
       });
-    });
+    } catch (err) {
+      console.error('renderGridViewFromData failed', err, { filteredData });
+      reviewsContainer.innerHTML = `<p class="text-red-400 text-center mt-4">Render error: ${err.message}</p>`;
+    }
   }
 
   // Render Reviews with Filters
@@ -149,9 +171,21 @@ window.addEventListener('DOMContentLoaded', () => {
       return artistMatch && albumMatch && ratingMatch && songMatch;
     });
 
-    resultCount.textContent = `${filtered.length} song${filtered.length !== 1 ? 's' : ''} found`;
+    if (window.currentView === 'albums') {
+      const albumKeys = new Set((filtered || [])
+        .filter(r => {
+          const albumLower = String((r && r.album) || '').trim().toLowerCase();
+          return !(albumLower === 'single' || albumLower === 'singles' || /^single\b/.test(albumLower));
+        })
+        .map(r => `${normalize(r && r.album ? r.album : 'Unknown Album')}|${normalize(getMainArtist(r && r.artist ? r.artist : '') || 'Various Artists')}`)
+      );
+      resultCount.textContent = `${albumKeys.size} album${albumKeys.size !== 1 ? 's' : ''} found`;
+    } else {
+      resultCount.textContent = `${filtered.length} song${filtered.length !== 1 ? 's' : ''} found`;
+    }
 
-    if (window.currentView === 'grid') renderGridViewFromData(filtered);
+    // show albums view when currentView is 'albums'
+    if (window.currentView === 'albums') renderGridViewFromData(filtered);
     else renderListView(filtered);
   }
 
@@ -179,11 +213,11 @@ window.addEventListener('DOMContentLoaded', () => {
   const toggleBtn = document.getElementById('toggleViewBtn');
   if (toggleBtn) {
     toggleBtn.addEventListener('click', () => {
-      window.currentView = window.currentView === 'list' ? 'grid' : 'list';
-      toggleBtn.textContent = window.currentView === 'list' ? 'View Artists' : 'All Songs';
+      window.currentView = window.currentView === 'list' ? 'albums' : 'list';
+      toggleBtn.textContent = window.currentView === 'list' ? 'View Albums' : 'All Songs';
       renderReviews();
     });
-    toggleBtn.textContent = 'View Artists';
+    toggleBtn.textContent = 'View Albums';
   }
 
   setTimeout(fetchReviews, 100);
