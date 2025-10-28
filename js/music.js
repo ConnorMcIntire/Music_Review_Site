@@ -6,7 +6,11 @@ window.addEventListener('DOMContentLoaded', () => {
   const songSearch = document.getElementById('songSearch');
   const loadingEl = document.getElementById('loading');
   const resultCount = document.getElementById('resultCount');
-
+  const albumSort = document.getElementById('albumSort');
+  const songSort = document.getElementById('songSort');
+  const songSortLabel = document.getElementById('songSortLabel');
+  const albumSortLabel = document.getElementById('albumSortLabel');
+  
   let reviews = [];
   window.currentView = 'list';
 
@@ -41,12 +45,29 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // Render List View
   function renderListView(filtered) {
-    if (!filtered.length) {
+     // copy incoming array and sort according to the songSort control (only affects songs view)
+    const sortMode = (songSort && songSort.value) || 'rating-desc';
+    const sorted = Array.isArray(filtered) ? filtered.slice() : [];
+
+    if (sortMode === 'rating-desc') {
+      sorted.sort((a, b) => (Number(b && b.rating) || 0) - (Number(a && a.rating) || 0) || String(a && a.song || '').localeCompare(String(b && b.song || '')));
+    } else if (sortMode === 'rating-asc') {
+      sorted.sort((a, b) => (Number(a && a.rating) || 0) - (Number(b && b.rating) || 0) || String(a && a.song || '').localeCompare(String(b && b.song || '')));
+    } else if (sortMode === 'title-asc') {
+      sorted.sort((a, b) => String(a && a.song || '').localeCompare(String(b && b.song || '')));
+    } else if (sortMode === 'title-desc') {
+      sorted.sort((a, b) => String(b && b.song || '').localeCompare(String(a && a.song || '')));
+    } else if (sortMode === 'artist-asc') {
+      sorted.sort((a, b) => (String(getMainArtist(a && a.artist) || '').localeCompare(String(getMainArtist(b && b.artist) || ''))) || String(a && a.song || '').localeCompare(String(b && b.song || '')));
+    }
+
+    // now continue with existing rendering logic but use `sorted` instead of `filtered`
+    if (!sorted.length) {
       reviewsContainer.innerHTML = `<p class="text-center text-slate-400 italic py-8">No reviews match your filters.</p>`;
       return;
     }
 
-    reviewsContainer.innerHTML = filtered.map(r => `
+    reviewsContainer.innerHTML = sorted.map(r => `
       <div class="p-4 rounded shadow transition-transform transform hover:scale-[1.02] hover:shadow-lg" style="${getRatingStyle(Number(r.rating))}">
         <div class="text-center mb-2">
           <div class="text-lg font-bold text-blue-200">
@@ -63,19 +84,11 @@ window.addEventListener('DOMContentLoaded', () => {
   // Render Grid View (now: Albums view)
   function renderGridViewFromData(filteredData) {
     try {
-      // drop invalid items and remove entries that are singles (so they don't appear as albums)
-      filteredData = (filteredData || [])
-        .filter(it => it && typeof it === 'object')
-        .filter(song => {
-          const albumLower = String((song && song.album) || '').trim().toLowerCase();
-          return !(albumLower === 'single' || albumLower === 'singles' || /^single\b/.test(albumLower));
-        });
- 
+      filteredData = (filteredData || []).filter(it => it && typeof it === 'object');
       const albumsMap = {};
-
       filteredData.forEach(song => {
         const albumRaw = song && song.album;
-        const albumName = (albumRaw == null) ? 'Unknown Album' : String(albumRaw);
+        const albumName = (albumRaw == null) ? 'Unknown Album' : String(albumRaw).trim();
         const artistRaw = song && song.artist;
         const mainArtist = getMainArtist(String(artistRaw || '')) || 'Various Artists';
         const albumKey = `${normalize(albumName)}|${normalize(mainArtist)}`;
@@ -94,25 +107,37 @@ window.addEventListener('DOMContentLoaded', () => {
         albumsMap[albumKey].songs.push(song);
       });
 
-      const sortedAlbumKeys = Object.keys(albumsMap).sort((a, b) => {
-        const A = String(albumsMap[a].displayAlbum || '').toLowerCase();
-        const B = String(albumsMap[b].displayAlbum || '').toLowerCase();
-        if (A === B) return String(albumsMap[a].displayArtist || '').localeCompare(String(albumsMap[b].displayArtist || ''));
-        return A.localeCompare(B);
+      // build albums array with computed averages, then sort according to UI
+      const albums = Object.keys(albumsMap).map(key => {
+        const g = albumsMap[key];
+        const songs = g.songs || [];
+        const total = songs.reduce((sum, s) => sum + (Number(s && s.rating) || 0), 0);
+        const avg = songs.length ? (total / songs.length) : 0;
+        return {
+          key,
+          displayAlbum: String(g.displayAlbum || ''),
+          displayArtist: String(g.displayArtist || ''),
+          songs,
+          avg
+        };
       });
-
-      if (!sortedAlbumKeys.length) {
+      
+      const sortMode = (albumSort && albumSort.value) || 'avg-desc';
+      if (sortMode === 'avg-desc') albums.sort((a, b) => b.avg - a.avg || a.displayAlbum.localeCompare(b.displayAlbum));
+      else if (sortMode === 'avg-asc') albums.sort((a, b) => a.avg - b.avg || a.displayAlbum.localeCompare(b.displayAlbum));
+      else if (sortMode === 'album-asc') albums.sort((a, b) => a.displayAlbum.localeCompare(b.displayAlbum));
+      else if (sortMode === 'album-desc') albums.sort((a, b) => b.displayAlbum.localeCompare(a.displayAlbum));
+      else if (sortMode === 'artist-asc') albums.sort((a, b) => a.displayArtist.localeCompare(b.displayArtist) || a.displayAlbum.localeCompare(b.displayAlbum));
+      
+      if (!albums.length) {
         reviewsContainer.innerHTML = `<p class="text-center text-slate-400 italic py-8">No reviews match your filters.</p>`;
         return;
       }
 
-      reviewsContainer.innerHTML = sortedAlbumKeys.map(key => {
-        const group = albumsMap[key];
+      // render from sorted albums array
+      reviewsContainer.innerHTML = albums.map(group => {
         const songs = group.songs || [];
-
-        const total = songs.reduce((sum, s) => sum + (Number(s && s.rating) || 0), 0);
-        const avg = songs.length ? (total / songs.length) : 0;
-        const avgDisplay = Math.round(avg * 10) / 10;
+        const avgDisplay = Math.round(group.avg * 10) / 10;
 
         const songsHTML = songs.map(r => {
           const title = (r && r.song) ? String(r.song) : 'Untitled';
@@ -127,7 +152,7 @@ window.addEventListener('DOMContentLoaded', () => {
         }).join('');
 
         return `
-          <div class="p-4 rounded shadow cursor-pointer" style="${getRatingStyle(Math.round(avg))}">
+          <div class="p-4 rounded shadow cursor-pointer" style="${getRatingStyle(Math.round(group.avg))}">
             <div class="text-center mb-1">
               <div class="text-lg font-bold text-blue-300">
                 ${group.displayAlbum} <span class="text-sm text-slate-300">(${avgDisplay}/10)</span>
@@ -209,16 +234,66 @@ window.addEventListener('DOMContentLoaded', () => {
   albumFilter.addEventListener('input', renderReviews);
   ratingFilter.addEventListener('change', renderReviews);
   songSearch.addEventListener('input', renderReviews);
+  if (songSort) songSort.addEventListener('change', renderReviews);
+  if (albumSort) albumSort.addEventListener('change', renderReviews);
 
-  const toggleBtn = document.getElementById('toggleViewBtn');
-  if (toggleBtn) {
-    toggleBtn.addEventListener('click', () => {
-      window.currentView = window.currentView === 'list' ? 'albums' : 'list';
-      toggleBtn.textContent = window.currentView === 'list' ? 'View Albums' : 'All Songs';
-      renderReviews();
-    });
-    toggleBtn.textContent = 'View Albums';
+  const viewAlbumsBtn = document.getElementById('viewAlbumsBtn');
+  const viewSongsBtn = document.getElementById('viewSongsBtn');
+
+  function updateViewButtons() {
+    if (viewAlbumsBtn) {
+      if (window.currentView === 'albums') {
+        viewAlbumsBtn.className = 'px-6 py-3 rounded-md bg-blue-600 hover:bg-blue-500 text-white font-semibold transition-shadow hover:shadow-lg';
+      } else {
+        viewAlbumsBtn.className = 'px-6 py-3 rounded-md bg-slate-700 hover:bg-slate-600 text-slate-100 font-semibold transition';
+      }
+    }
+    if (viewSongsBtn) {
+      if (window.currentView === 'list') {
+        viewSongsBtn.className = 'px-6 py-3 rounded-md bg-blue-600 hover:bg-blue-500 text-white font-semibold transition-shadow hover:shadow-lg';
+      } else {
+        viewSongsBtn.className = 'px-6 py-3 rounded-md bg-slate-700 hover:bg-slate-600 text-slate-100 font-semibold transition';
+      }
+    }
+
+    // show only the relevant sorter for the active view
+    if (typeof songSort !== 'undefined' && songSort) {
+      if (window.currentView === 'list') songSort.classList.remove('hidden');
+      else songSort.classList.add('hidden');
+    }
+    if (typeof albumSort !== 'undefined' && albumSort) {
+      if (window.currentView === 'albums') albumSort.classList.remove('hidden');
+      else albumSort.classList.add('hidden');
+    }
+
+    // show/hide the visible label text to match the sorter
+    if (typeof songSortLabel !== 'undefined' && songSortLabel) {
+      if (window.currentView === 'list') songSortLabel.classList.remove('hidden');
+      else songSortLabel.classList.add('hidden');
+    }
+    if (typeof albumSortLabel !== 'undefined' && albumSortLabel) {
+      if (window.currentView === 'albums') albumSortLabel.classList.remove('hidden');
+      else albumSortLabel.classList.add('hidden');
+    }
   }
+
+  if (viewAlbumsBtn) {
+    viewAlbumsBtn.addEventListener('click', () => {
+      window.currentView = 'albums';
+      updateViewButtons();
+      try { renderReviews(); } catch (e) { console.error('renderReviews failed:', e); }
+    });
+  }
+  if (viewSongsBtn) {
+    viewSongsBtn.addEventListener('click', () => {
+      window.currentView = 'list';
+      updateViewButtons();
+      try { renderReviews(); } catch (e) { console.error('renderReviews failed:', e); }
+    });
+  }
+
+  // initial button state
+  updateViewButtons();
 
   setTimeout(fetchReviews, 100);
 });

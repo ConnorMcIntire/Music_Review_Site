@@ -81,13 +81,40 @@
   </section>
 
   <!-- Toggle View -->
-  <div class="text-center mb-8">
+  <div class="text-center mb-8 flex justify-center gap-4 items-center">
     <button
-      id="toggleViewBtn"
+      id="viewSongsBtn"
       class="px-6 py-3 rounded-md bg-blue-600 hover:bg-blue-500 text-white font-semibold transition-shadow hover:shadow-lg"
+      title="Show all songs"
+    >
+      View Songs
+    </button>
+
+    <button
+      id="viewAlbumsBtn"
+      class="px-6 py-3 rounded-md bg-slate-700 hover:bg-slate-600 text-slate-100 font-semibold transition"
+      title="Show albums (grouped)"
     >
       View Albums
     </button>
+
+    <span id="songSortLabel" class="text-slate-300 mr-2">Song Sort</span>
+    <select id="songSort" class="px-3 py-2 rounded-md bg-slate-700 text-slate-100 border border-slate-600">
+      <option value="rating-desc">Rating (High → Low)</option>
+      <option value="rating-asc">Rating (Low → High)</option>
+      <option value="title-asc">Title A → Z</option>
+      <option value="title-desc">Title Z → A</option>
+      <option value="artist-asc">Artist A → Z</option>
+    </select>
+
+    <span id="albumSortLabel" class="text-slate-300 mr-2">Album Sort</span>
+    <select id="albumSort" class="px-3 py-2 rounded-md bg-slate-700 text-slate-100 border border-slate-600">
+      <option value="avg-desc">Avg (High → Low)</option>
+      <option value="avg-asc">Avg (Low → High)</option>
+      <option value="album-asc">Album A → Z</option>
+      <option value="album-desc">Album Z → A</option>
+      <option value="artist-asc">Artist A → Z</option>
+    </select>
   </div>
 
   <!-- Result Count -->
